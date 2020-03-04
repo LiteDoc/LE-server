@@ -28,11 +28,18 @@ func readLockHandler(w http.ResponseWriter, r *http.Request, registerLocks map[s
 	var clientName string = q.Get("name")
 	var clientRegisterID string = q.Get("registerID")
 
-	if registerLocks[clientRegisterID].owner == clientName {
+	if registerLocks[clientRegisterID].Owner == clientName {
 		w.Write([]byte("true"))
 		return
 	}
 	w.Write([]byte("false"))
+	return
+}
+
+// readLocksHandler : return information of register locks
+func readLocksHandler(w http.ResponseWriter, r *http.Request, registerLocks map[string]registerLock) {
+	log.Print("Register locks read.\n")
+	json.NewEncoder(w).Encode(registerLocks)
 	return
 }
 
@@ -44,8 +51,8 @@ func lockHandler(w http.ResponseWriter, r *http.Request, registerLocks map[strin
 	var clientRegisterID string = q.Get("registerID")
 
 	var selectedLock = registerLocks[clientRegisterID]
-	if selectedLock.owner == "none" {
-		selectedLock.owner = clientName
+	if selectedLock.Owner == "none" {
+		selectedLock.Owner = clientName
 		registerLocks[clientRegisterID] = selectedLock
 		log.Print(registerLocks)
 		json.NewEncoder(w).Encode(jSONResponse{Status: "Lock Success", Code: 200})
@@ -64,8 +71,8 @@ func unlockHandler(w http.ResponseWriter, r *http.Request, registerLocks map[str
 	var clientRegisterID string = q.Get("registerID")
 
 	var selectedLock = registerLocks[clientRegisterID]
-	if selectedLock.owner == clientName {
-		selectedLock.owner = "none"
+	if selectedLock.Owner == clientName {
+		selectedLock.Owner = "none"
 		registerLocks[clientRegisterID] = selectedLock
 		log.Print(registerLocks)
 		json.NewEncoder(w).Encode(jSONResponse{Status: "Unlock Success", Code: 200})
@@ -81,6 +88,10 @@ func AddRoutes(router *mux.Router, registerLocks map[string]registerLock) {
 	router.HandleFunc("/readLock", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 		readLockHandler(w, r, registerLocks)
+	})
+	router.HandleFunc("/readLocks", func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		readLocksHandler(w, r, registerLocks)
 	})
 	router.HandleFunc("/lock", func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)

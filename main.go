@@ -10,8 +10,8 @@ import (
 )
 
 type registerLock struct {
-	owner string
-	queue []string
+	Owner string
+	Queue []string
 }
 
 func main() {
@@ -20,9 +20,9 @@ func main() {
 
 	// Initialize register lock map
 	registerLocks := map[string]registerLock{
-		"1": registerLock{owner: "none", queue: []string{}},
-		"2": registerLock{owner: "none", queue: []string{}},
-		"3": registerLock{owner: "none", queue: []string{}},
+		"1": registerLock{Owner: "none", Queue: []string{}},
+		"2": registerLock{Owner: "none", Queue: []string{}},
+		"3": registerLock{Owner: "none", Queue: []string{}},
 	}
 
 	// Initialize Router
